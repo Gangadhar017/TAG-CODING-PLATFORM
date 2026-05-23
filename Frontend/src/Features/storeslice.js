@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { io } from 'socket.io-client';
-const backendURL = import.meta.env.VITE_BACKEND_URL_FOR_SOCKET;
+const backendURL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : window.location.origin;
 const socket = io(backendURL);
 
 const socketSlice = createSlice({

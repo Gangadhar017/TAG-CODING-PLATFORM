@@ -4,11 +4,23 @@ import { app } from '../app.js';
 
 export const createSocketServer = () => {
     const server = http.createServer(app);
+
+    const allowedOrigins = (process.env.CORS_ORIGIN || '')
+        .split(',')
+        .map(o => o.trim())
+        .filter(Boolean);
+
     const io = new Server(server, {
         cors: {
-            origin: process.env.CORS_ORIGIN,
-            methods:  ['GET','POST','PUT','DELETE','PATCH'],
-            credentials: true  
+            origin: (origin, callback) => {
+                if (!origin) return callback(null, true);
+                if (allowedOrigins.length === 0 || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+                    return callback(null, true);
+                }
+                return callback(new Error(`Socket CORS blocked for: ${origin}`));
+            },
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+            credentials: true,
         }
     });
 

@@ -8,7 +8,7 @@
     "start": "node src/server.js", 
     "build": "echo 'No build step required for this project'"
   },
-  "author": "Pranav Jarande",
+  "author": "Gangadhar",
   "license": "ISC",
   "description": "",
   "devDependencies": {

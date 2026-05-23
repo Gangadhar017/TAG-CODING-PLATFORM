@@ -1,6 +1,5 @@
 import {v2 as cloudinary} from 'cloudinary'
 import fs from 'fs'
-import path from 'path'
 
 cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -8,41 +7,30 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const uploadOnCloudinary = async (localFilePath)=>{
+const uploadOnCloudinary = async (localFilePath) => {
     try {
         if (!localFilePath) return null;
 
-        // Fallback to local serving if Cloudinary is not configured
+        // If Cloudinary is not configured, warn and return null (don't serve localhost URLs in prod)
         if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-            console.log("Cloudinary credentials not set. Falling back to local static serving.");
-            const port = process.env.PORT || 8000;
-            const backendUrl = `http://localhost:${port}`;
-            return {
-                url: `${backendUrl}/temp/${path.basename(localFilePath)}`
-            };
+            console.warn("⚠️  Cloudinary credentials not set. Avatar upload will not work. Please configure CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET in your environment.");
+            // Clean up temp file
+            try { if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath); } catch (_) {}
+            return null;
         }
 
-        const response=await cloudinary.uploader.upload(localFilePath,{
-            resource_type:"auto"
+        const response = await cloudinary.uploader.upload(localFilePath, {
+            resource_type: "auto"
         });
-        fs.unlinkSync(localFilePath);
+        // Clean up local temp file after upload
+        try { fs.unlinkSync(localFilePath); } catch (_) {}
         return response;
     } catch (error) {
-        console.error("Cloudinary upload failed, falling back to local static serving:", error);
-        // Fallback to local static serving if upload failed
-        try {
-            if (fs.existsSync(localFilePath)) {
-                const port = process.env.PORT || 8000;
-                const backendUrl = `http://localhost:${port}`;
-                return {
-                    url: `${backendUrl}/temp/${path.basename(localFilePath)}`
-                };
-            }
-        } catch (fallbackError) {
-            console.error("Local fallback also failed:", fallbackError);
-        }
+        console.error("Cloudinary upload failed:", error);
+        // Clean up temp file on error
+        try { if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath); } catch (_) {}
         return null;
     }
 }
 
-export {uploadOnCloudinary};
+export { uploadOnCloudinary };
