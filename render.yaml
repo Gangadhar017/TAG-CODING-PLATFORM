@@ -2,14 +2,16 @@ services:
   - type: web
     name: tag-coding-platform
     env: node
+    region: oregon
+    plan: free
     rootDir: Backend
-    buildCommand: cd ../Frontend && npm install && npm run build && cp -r dist/* ../Backend/public/ && cd ../Backend && npm install
+    buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 8000
+        value: 10000
       - key: MONGODB_URI
         sync: false
       - key: DB_NAME
@@ -17,9 +19,9 @@ services:
       - key: CORS_ORIGIN
         sync: false
       - key: ACCESS_TOKEN_SECRET
-        sync: false
+        generateValue: true
       - key: REFRESH_TOKEN_SECRET
-        sync: false
+        generateValue: true
       - key: ACCESS_TOKEN_EXPIRY
         value: 1d
       - key: REFRESH_TOKEN_EXPIRY
