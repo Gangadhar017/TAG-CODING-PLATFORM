@@ -64,7 +64,7 @@ const Header = () => {
                 <div className="relative">
                   <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 opacity-20 group-hover:opacity-100 blur transition duration-300"></div>
                   <img 
-                    src={user.avatar || '/public/defaultuser.png'} 
+                    src={user.avatar || '/defaultuser.png'} 
                     alt="User" 
                     className="relative w-8 h-8 rounded-full object-cover border border-slate-700/60"
                   />

@@ -65,7 +65,7 @@ function Home() {
                         <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-orange-500 via-yellow-500 to-amber-500 opacity-20 blur-[20px] group-hover:opacity-40 group-hover:blur-[25px] transition-all duration-700 animate-pulse"></div>
                         <div className="relative bg-slate-900 border border-slate-800 p-8 rounded-[40px] shadow-2xl flex items-center justify-center">
                             <img 
-                                src="/dist/homelogo.png" 
+                                src="/homelogo.png" 
                                 alt="TAG Platform Logo" 
                                 className="h-72 w-72 rounded-full object-cover transform hover:scale-[1.03] transition-all duration-700 shadow-inner"
                             />

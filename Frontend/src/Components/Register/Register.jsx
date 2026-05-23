@@ -57,7 +57,7 @@ const Register = () => {
           <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 opacity-20 blur-[20px] group-hover:opacity-35 transition duration-700"></div>
           <div className="relative bg-slate-900/40 border border-slate-900/60 p-10 rounded-[36px] shadow-2xl flex items-center justify-center">
             <img 
-              src="/dist/logo.png" 
+              src="/logo.png" 
               alt="Logo" 
               className="h-56 w-auto object-contain transform hover:scale-[1.02] transition-all duration-500" 
             />

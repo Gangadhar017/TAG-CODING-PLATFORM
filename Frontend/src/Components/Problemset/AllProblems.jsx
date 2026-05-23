@@ -45,7 +45,7 @@ const AllProblems = () => {
                         <div className="relative mb-6">
                             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 opacity-20 blur group-hover:opacity-40 transition duration-500"></div>
                             <img 
-                                src="/dist/homelogo.png" 
+                                src="/homelogo.png" 
                                 alt="Logo" 
                                 className="relative h-32 w-32 rounded-full object-cover shadow-2xl border border-slate-800"
                             />
