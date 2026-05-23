@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Reply from '../Discuss/Reply.jsx';
 import { fetchProblemTweets } from '../../Services/Tweet.service.js';
 function DiscussProblem({id}) {

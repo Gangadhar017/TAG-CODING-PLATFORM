@@ -5,7 +5,7 @@ export const runExampleCasesService = async (language, code, example_cases) => {
     try {
         const userData ={language,code,example_cases};
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${backendURL}/runcode/runexaplecases`, {
+        const response = await fetch(`${backendURL}/api/v1/runcode/runexaplecases`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -35,7 +35,7 @@ export const submitCodeService = async(language,code,problem_id)=>{
     try {
         const userData={language,code,problem_id};
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${backendURL}/runcode/submitcode`, {
+        const response = await fetch(`${backendURL}/api/v1/runcode/submitcode`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

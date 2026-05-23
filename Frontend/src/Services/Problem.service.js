@@ -3,7 +3,7 @@ const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 export const getAllProblemsService = async () => {
   try {
-    const response = await fetch(`${backendURL}/problem`, {
+    const response = await fetch(`${backendURL}/api/v1/problem`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -11,14 +11,14 @@ export const getAllProblemsService = async () => {
     const data = await response.json();
     if (response?.status === 200) {
       return data.data;
-    } 
-    else 
+    }
+    else
     {
       toast.error('Server Error');
       return false;
     }
-  } 
-  catch (error) 
+  }
+  catch (error)
   {
     toast.error('Server Error');
     console.error(error);
@@ -28,22 +28,22 @@ export const getAllProblemsService = async () => {
 
 export const getProblemService = async (id) => {
     try {
-      const response = await fetch(`${backendURL}/problem/${id}`, {
+      const response = await fetch(`${backendURL}/api/v1/problem/${id}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
-  
+
       const data = await response.json();
       if (response?.status === 200) {
         return data.data;
-      } 
-      else 
+      }
+      else
       {
         toast.error('Server Error');
         return false;
       }
-    } 
-    catch (error) 
+    }
+    catch (error)
     {
       toast.error('Server Error');
       console.error(error);
@@ -54,7 +54,7 @@ export const getProblemService = async (id) => {
 export const updatedefaultlangService=async(lang)=>{
   try {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch(`${backendURL}/users/updatedefaultlang/${lang}`, {
+    const response = await fetch(`${backendURL}/api/v1/users/updatedefaultlang/${lang}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -63,10 +63,10 @@ export const updatedefaultlangService=async(lang)=>{
     });
     if (response.status === 200) {
       return true;
-    } 
+    }
     return false;
-  } 
-  catch (error) 
+  }
+  catch (error)
   {
     console.log(error);
   }
@@ -75,7 +75,7 @@ export const updatedefaultlangService=async(lang)=>{
 export const updateTemplateService=async(lang,userData)=>{
   try {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch(`${backendURL}/users/updatetemplate/${lang}`, {
+    const response = await fetch(`${backendURL}/api/v1/users/updatetemplate/${lang}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -100,7 +100,7 @@ export const updateTemplateService=async(lang,userData)=>{
 export const getdefaultlangtempService=async()=>{
   try {
     const token = localStorage.getItem('accessToken');
-    const response = await fetch(`${backendURL}/users/getdeflangandtemplate`, {
+    const response = await fetch(`${backendURL}/api/v1/users/getdeflangandtemplate`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -110,10 +110,10 @@ export const getdefaultlangtempService=async()=>{
     const data = await response.json();
     if (response.status === 200) {
       return data.data;
-    } 
+    }
     return null;
-  } 
-  catch (error) 
+  }
+  catch (error)
   {
     console.log(error);
     return null;

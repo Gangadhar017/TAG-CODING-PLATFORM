@@ -1,34 +1,44 @@
 import React from 'react'
 
-function Description({problem}) {
+function Description({ problem }) {
     return (
-        <>
-        <div className="mb-4 text-lg">
-            <p className="whitespace-pre-line">{problem.description}</p>
-        </div>
-        <div className="mb-4 bg-gray-700 p-3 rounded-lg">
-            <div className='p-4 rounded-lg bg-gray-900'>
-                <h2 className="text-2xl font-extrabold mb-2">Input:</h2>
-                <p className="whitespace-pre-line">{problem.input_format}</p>
+        <div className="space-y-6">
+            {/* Core Description Text */}
+            <div className="text-[15px] font-medium text-slate-300 leading-relaxed font-sans">
+                <p className="whitespace-pre-line">{problem.description}</p>
             </div>
-        </div>
-        <div className="mb-4 bg-gray-700 p-3 rounded-lg">
-            <div className='p-4 rounded-lg bg-gray-900'>
-                <h2 className="text-2xl font-extrabold mb-2">Output:</h2>
-                <p className="whitespace-pre-line">{problem.output_format}</p>
+
+            {/* Input Format Card */}
+            <div className="bg-slate-950/40 border border-slate-900 rounded-2xl p-6 hover:border-slate-800 transition duration-300 shadow-sm">
+                <h3 className="text-[12px] font-bold font-outfit text-slate-500 uppercase tracking-widest mb-3">Input Format</h3>
+                <p className="whitespace-pre-line text-[14.5px] font-medium text-slate-300 leading-relaxed font-sans">
+                    {problem.input_format}
+                </p>
             </div>
-        </div>
-        <div className="mb-4 bg-gray-700 p-3 rounded-lg">
-            <div className='p-4 rounded-lg bg-gray-900'>
-                <h2 className="text-2xl font-extrabold mb-2">Constraints:</h2>
-                <ul className="list-disc pl-5 text-gray-300">
-                    {problem.constraints.map((constraint, index) => (
-                        <li key={index}>{constraint}</li>
-                    ))}
-                </ul>
+
+            {/* Output Format Card */}
+            <div className="bg-slate-950/40 border border-slate-900 rounded-2xl p-6 hover:border-slate-800 transition duration-300 shadow-sm">
+                <h3 className="text-[12px] font-bold font-outfit text-slate-500 uppercase tracking-widest mb-3">Output Format</h3>
+                <p className="whitespace-pre-line text-[14.5px] font-medium text-slate-300 leading-relaxed font-sans">
+                    {problem.output_format}
+                </p>
             </div>
+
+            {/* Constraints Card */}
+            {problem.constraints && problem.constraints.length > 0 && (
+                <div className="bg-slate-950/40 border border-slate-900 rounded-2xl p-6 hover:border-slate-800 transition duration-300 shadow-sm">
+                    <h3 className="text-[12px] font-bold font-outfit text-slate-500 uppercase tracking-widest mb-3">Constraints</h3>
+                    <ul className="space-y-2.5 text-[14.5px] font-medium text-slate-300 leading-relaxed font-sans list-none">
+                        {problem.constraints.map((constraint, index) => (
+                            <li key={index} className="flex items-start">
+                                <span className="text-orange-500 mr-2.5 mt-0.5 select-none font-bold font-outfit text-sm">•</span>
+                                <span>{constraint}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
-        </> 
     )
 }
 

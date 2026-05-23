@@ -1,8 +1,8 @@
 import { ApiError } from "../utils/ApiError.js";
 
 const forbiddenWords = {
-    c: ["system", "exec", "pipe", "malloc", "free", "realloc", "delete", "fork", "system("],
-    cpp: ["system", "exec", "pipe", "malloc", "free", "realloc", "delete", "popen", "fork", "unistd.h"],
+    c: ["system", "exec", "pipe", "fork", "system("],
+    cpp: ["system", "exec", "pipe", "popen", "fork", "unistd.h"],
     java: ["Runtime.exec", "ProcessBuilder", "Process", "getRuntime()", "exec(", "start()"],
     python: [
         "subprocess.run", "os.system", "os.spawn", "open", "read", "write", 

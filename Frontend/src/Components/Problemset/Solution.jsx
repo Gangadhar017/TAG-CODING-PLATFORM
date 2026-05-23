@@ -1,31 +1,53 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 function Solution({ solution }) {
-    const [openSolution, setOpenSolution]=useState(null);
-    const toggleSolution=(lang)=>{
-        setOpenSolution((prev)=>(prev===lang ? null:lang));
+    const [openSolution, setOpenSolution] = useState(null);
+    const toggleSolution = (lang) => {
+        setOpenSolution((prev) => (prev === lang ? null : lang));
+    };
+
+    const getLangLabel = (lang) => {
+        switch (lang.toLowerCase()) {
+            case 'cpp': return 'C++';
+            case 'c': return 'C';
+            case 'java': return 'Java';
+            case 'python': return 'Python';
+            default: return lang.toUpperCase();
+        }
     };
 
     return (
-        <div className='bg-gray-700 rounded-xl'>
-        <div className="space-y-4 p-4 to-gray-800 rounded-lg shadow-lg">
-            {Object.keys(solution).map((lang, index) => (
-                <div key={index} className="border-l-4 border-yellow-500 px-4 py-1 bg-gray-900 rounded-lg">
-                    <p className="cursor-pointer text-yellow-500 font-bold text-lg mb-2 p-4 flex justify-between items-center"
-                        onClick={() => toggleSolution(lang)}>
-                        {lang.toUpperCase()} Solution
-                        <span className={`transform ${openSolution === lang ? 'rotate-180' : ''}`}>
-                            {openSolution === lang ? '▲' : '▼'}
-                        </span>
-                    </p>
-                    {openSolution === lang && (
-                        <pre className="p-4 bg-black text-yellow-100 rounded-lg overflow-auto">
-                            {solution[lang]}
-                        </pre>
-                    )}
-                </div>
+        <div className="space-y-4">
+            <h2 className="text-xl font-bold font-outfit text-white mb-4 tracking-wide">Official Solutions</h2>
+            
+            <div className="space-y-3 pr-1">
+                {Object.keys(solution).map((lang, index) => (
+                    <div 
+                        key={index} 
+                        className="bg-slate-950/40 border border-slate-900 rounded-2xl overflow-hidden hover:border-slate-800 transition duration-300 shadow-sm"
+                    >
+                        <div 
+                            className="flex justify-between items-center px-6 py-4 cursor-pointer hover:bg-slate-900/20 transition-all font-outfit select-none"
+                            onClick={() => toggleSolution(lang)}
+                        >
+                            <span className="text-[15px] font-bold text-orange-400">
+                                {getLangLabel(lang)} Solution
+                            </span>
+                            <span className={`text-[12px] text-slate-500 font-bold transform transition-transform duration-300 ${openSolution === lang ? 'rotate-180 text-orange-400' : ''}`}>
+                                ▼
+                            </span>
+                        </div>
+                        
+                        {openSolution === lang && (
+                            <div className="p-5 border-t border-slate-900 bg-slate-950/90 overflow-x-auto">
+                                <pre className="text-[14px] font-medium font-mono text-slate-300 leading-relaxed custom-scrollbar">
+                                    <code>{solution[lang]}</code>
+                                </pre>
+                            </div>
+                        )}
+                    </div>
                 ))}
-        </div>
+            </div>
         </div>
     );
 }

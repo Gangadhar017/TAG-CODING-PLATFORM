@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import Header from './Components/Header/Header.jsx'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import axios from 'axios'
 import { refreshTokenService } from './Services/Auth.service.js'
 

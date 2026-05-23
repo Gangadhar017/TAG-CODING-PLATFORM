@@ -3,7 +3,7 @@ const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 export const fetchTweets=async () => {
   try {
-    const response = await fetch(`${backendURL}/tweet`, {
+    const response = await fetch(`${backendURL}/api/v1/tweet`, {
       method: 'GET',
       headers: { 
         'Content-Type': 'application/json' ,
@@ -32,7 +32,7 @@ export const createTweetService = async (content, replyOf, imageFile) => {
     if(replyOf)formData.append('replyOf', replyOf);
     if (imageFile)formData.append('image', imageFile);
     
-    const response = await fetch(`${backendURL}/tweet/createtweet`, {
+    const response = await fetch(`${backendURL}/api/v1/tweet/createtweet`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -57,7 +57,7 @@ export const createTweetService = async (content, replyOf, imageFile) => {
 
 export const fetchProblemTweets=async (id) => {
   try {
-    const response = await fetch(`${backendURL}/tweet/problem/${id}`, {
+    const response = await fetch(`${backendURL}/api/v1/tweet/problem/${id}`, {
       method: 'GET',
       headers: { 
         'Content-Type': 'application/json' ,

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { isLoggedIn } from '../../Services/Auth.service.js';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSocket } from '../../Features/useSocket.js';
@@ -29,44 +29,66 @@ function HostInterview() {
     };
 
     return (
-        <div className="h-screen flex bg-gray-800 text-white p-10">
-            <div className="w-1/3 flex items-center justify-center rounded-lg p-6 bg-gray-900">
-                <img src="/homelogo.png" alt="Logo" className="h-96 drop-shadow-lg rounded-full object-cover" />
-            </div>
-            <div className="w-2/3 flex bg-gray-900 items-center justify-center space-y-8 mx-10 rounded-lg">
-                {isLoggedIn() ? (
-                    <div className='bg-gray-800 p-16 rounded-2xl'>
-                        <div className="flex flex-col gap-6 bg-gray-900 p-12 rounded-3xl shadow-lg max-w-md mx-auto">
-                            <h2 className="text-4xl font-extrabold text-gray-100 mb-2 tracking-wide text-center">
-                                Create Room
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 md:p-12 font-sans relative overflow-hidden">
+            {/* Ambient gradients */}
+            <div className="absolute top-24 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="absolute bottom-24 right-1/4 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div className="relative z-10 max-w-5xl w-full flex flex-col md:flex-row gap-8 items-center bg-slate-900/40 backdrop-blur-md border border-slate-900 p-8 md:p-16 rounded-[32px] shadow-2xl">
+                
+                {/* Left Visual side */}
+                <div className="w-full md:w-1/2 flex flex-col items-center justify-center text-center p-4">
+                    <div className="relative group mb-8">
+                        <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 opacity-20 blur group-hover:opacity-40 transition duration-500"></div>
+                        <img 
+                            src="/dist/homelogo.png" 
+                            alt="Logo" 
+                            className="relative h-60 w-60 md:h-72 md:w-72 rounded-full object-cover shadow-2xl border border-slate-800/80" 
+                        />
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-extrabold font-outfit tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+                        TAG Interview Rooms
+                    </h1>
+                    <p className="text-slate-400 font-outfit text-sm md:text-[15px] mt-3 max-w-sm leading-relaxed">
+                        Host real-time cooperative code pairing sessions with video streams, shared timers, and shared execution workspaces.
+                    </p>
+                </div>
+
+                {/* Right Action side */}
+                <div className="w-full md:w-1/2 flex items-center justify-center p-4">
+                    {isLoggedIn() ? (
+                        <div className="w-full max-w-md bg-slate-950/60 border border-slate-900 rounded-3xl p-8 md:p-10 shadow-xl flex flex-col gap-6">
+                            <h2 className="text-3xl font-extrabold font-outfit text-white tracking-wide text-center">
+                                Host Room
                             </h2>
-                            <p className="text-gray-400 mb-4 text-lg">
-                                Room ID will be generated automatically.
+                            <p className="text-slate-400 text-center font-sans text-sm leading-relaxed">
+                                Ready to interview? Generate a unique collaborative room instantly. Share the generated token with your candidate or peer to begin.
                             </p>
                             <button
                                 onClick={handleCreateRoom}
-                                className="px-6 py-3 mt-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
+                                className="w-full py-4 mt-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold font-outfit rounded-2xl shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                             >
                                 Create Room
                             </button>
                         </div>
-                    </div>
-                ) : (
-                    <div className='p-40 bg-gray-800 rounded-lg'>
-                        <div className="flex items-center justify-center n bg-gray-800 rounded-lg">
-                            <div className="text-center bg-white p-8 rounded-lg shadow-lg">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-4">You need to login</h2>
-                                <p className="text-gray-600 mb-6">Please log in to create or join an interview room.</p>
-                                <Link
-                                    to="/login"
-                                    className="inline-block px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition duration-300"
-                                >
-                                    Login Now
-                                </Link>
+                    ) : (
+                        <div className="w-full max-w-md bg-slate-950/60 border border-slate-900 rounded-3xl p-8 md:p-10 shadow-xl flex flex-col gap-6 text-center">
+                            <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-2xl shadow-inner">
+                                🔐
                             </div>
+                            <h2 className="text-2xl font-bold font-outfit text-white">Authentication Required</h2>
+                            <p className="text-slate-400 text-sm font-sans leading-relaxed">
+                                Please log in to create or host private video pairing session workspaces.
+                            </p>
+                            <Link
+                                to="/login"
+                                className="w-full py-3.5 mt-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold font-outfit rounded-2xl shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-center block"
+                            >
+                                Login Now
+                            </Link>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

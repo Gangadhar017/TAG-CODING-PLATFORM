@@ -50,22 +50,22 @@ const getAllproblems = asyncHandler(async (req, res) => {
         
     ]);
 
-    res.status(200).json(new ApiResponse(true, problems, "Problems retrieved successfully"));
+    res.status(200).json(new ApiResponse(200, problems, "Problems retrieved successfully"));
 });
 
 
 const getproblemById = asyncHandler(async (req, res) => {
     const {id} = req.params;
     const problem = await Problem.findById(id).select('-test_cases');
-    if (!problem) return res.status(404).json(new ApiResponse(false,null,"Problem not found"));
-    return res.status(200).json(new ApiResponse(true, problem,"Problem retrieved successfully"));
+    if (!problem) return res.status(404).json(new ApiResponse(404, null, "Problem not found"));
+    return res.status(200).json(new ApiResponse(200, problem, "Problem retrieved successfully"));
 });
 
 const deleteproblemById = asyncHandler(async (req, res) => {
     const {id} = req.params;
     const problem = await Problem.findByIdAndDelete(id);
-    if (!problem) return res.status(404).json(new ApiResponse(false,null,"Problem not found"));
-    return res.status(200).json(new ApiResponse(true, problem,"Problem Deleted successfully"));
+    if (!problem) return res.status(404).json(new ApiResponse(404, null, "Problem not found"));
+    return res.status(200).json(new ApiResponse(200, problem, "Problem Deleted successfully"));
 });
 
 

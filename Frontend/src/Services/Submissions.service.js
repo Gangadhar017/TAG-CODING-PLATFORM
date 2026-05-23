@@ -4,7 +4,7 @@ const backendURL = import.meta.env.VITE_BACKEND_URL;
 export const getSubmissionService=async (problem_id)=>{
     try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${backendURL}/submissions`, {
+        const response = await fetch(`${backendURL}/api/v1/submissions`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -15,22 +15,22 @@ export const getSubmissionService=async (problem_id)=>{
         const data = await response.json();
         if (response.status === 200) {
             return data.data;
-        } 
-        else 
+        }
+        else
         {
-            toast.error(data.message);  
+            toast.error(data.message);
             return [];
         }
     } catch (error) {
-        toast.error("Server error",error);  
+        toast.error("Server error",error);
         return [];
-    }    
+    }
 }
 
 export const getSolvedProblemService=async ()=>{
     try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${backendURL}/submissions`, {
+        const response = await fetch(`${backendURL}/api/v1/submissions`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

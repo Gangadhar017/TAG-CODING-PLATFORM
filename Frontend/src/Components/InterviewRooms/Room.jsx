@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSocket } from '../../Features/useSocket.js';
 import Editor from '@monaco-editor/react';
@@ -385,236 +385,355 @@ function Room() {
   }
 
   return (
-    <div className="h-screen p-6 bg-gray-800 flex text-white justify-evenly">
-      <div className='bg-gray-900 p-6 rounded-lg w-1/4 flex flex-col'>
+    <div className="min-h-screen lg:h-screen p-6 bg-slate-950 text-slate-100 flex flex-col lg:flex-row gap-6 relative overflow-hidden font-sans">
+      {/* Decorative background glows */}
+      <div className="absolute top-24 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-24 right-1/4 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+      {/* Left panel: Actions, Timer & Testcases */}
+      <div className="w-full lg:w-1/4 flex flex-col bg-slate-900/30 backdrop-blur-md border border-slate-900/80 p-6 rounded-[28px] shadow-xl space-y-6 z-10 shrink-0">
         <div className="flex flex-col space-y-6">
-          <div className="flex items-center justify-evenly space-x-4">
-          <button className="bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition" onClick={exitroom}>
-            <img className="h-6 w-6" src={'/endcall.png'} alt="end call" />
-          </button>
-          <button className={`py-2 px-4 rounded-lg shadow-md transition ${isAudioOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-600 hover:bg-red-700'}`} onClick={toggleAudio}>
-              <img className="h-6 w-6" src={isAudioOn ? '/micon.png' : '/micoff.png'} alt="Microphone" />
-          </button>
-          <button className={`py-2 px-4 rounded-lg shadow-md transition ${isVideoOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-600 hover:bg-red-700'}`} onClick={toggleVideo}>
-              <img className="h-6 w-6" src={isVideoOn ? '/camera-on.png' : '/camera-off.png'} alt="Camera" />
-          </button>
+          
+          {/* Hardware & Exit controls */}
+          <div className="flex items-center justify-center gap-3">
+            <button 
+              className="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 hover:border-rose-500/40 text-rose-500 p-3.5 rounded-2xl transition-all duration-300 shadow-md flex items-center justify-center" 
+              onClick={exitroom}
+              title="Exit Room"
+            >
+              <img className="h-5.5 w-5.5 filter invert-[45%] sepia-[90%] saturate-[2000%] hue-rotate-[335deg]" src="/endcall.png" alt="end call" />
+            </button>
+            <button 
+              className={`p-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-center ${
+                isAudioOn 
+                  ? 'bg-slate-800 hover:bg-slate-750 text-slate-300 border-slate-700/60 shadow-sm' 
+                  : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border-rose-500/25 shadow-md shadow-rose-500/5'
+              }`} 
+              onClick={toggleAudio}
+              title={isAudioOn ? "Mute Microphone" : "Unmute Microphone"}
+            >
+              <img className="h-5.5 w-5.5" src={isAudioOn ? '/micon.png' : '/micoff.png'} alt="Microphone" />
+            </button>
+            <button 
+              className={`p-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-center ${
+                isVideoOn 
+                  ? 'bg-slate-800 hover:bg-slate-750 text-slate-300 border-slate-700/60 shadow-sm' 
+                  : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border-rose-500/25 shadow-md shadow-rose-500/5'
+              }`} 
+              onClick={toggleVideo}
+              title={isVideoOn ? "Turn Camera Off" : "Turn Camera On"}
+            >
+              <img className="h-5.5 w-5.5" src={isVideoOn ? '/camera-on.png' : '/camera-off.png'} alt="Camera" />
+            </button>
           </div>
 
+          {/* Test cases panel */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-extrabold text-gray-300 text-center">Test Cases</h3>
-            {executing ? <Executing text={"Executing"}/> :
-            <>
-              {exampleCasesExecution ? 
+            <h3 className="text-lg font-bold font-outfit text-white tracking-wide border-b border-slate-900 pb-2">
+              Test Cases
+            </h3>
+            {executing ? (
+              <Executing text="Executing" />
+            ) : (
               <>
-                <div className='bg-gray-700 rounded-lg p-2'>
-                  <ExampleCasesOutput exampleCasesExecution={exampleCasesExecution}/>
-                </div>
-                <button className='px-2 py-1 rounded-lg bg-blue-600 text-white' onClick={()=>{
-                  setExampleCasesExecution(null);
-                }}>Reset Testcases</button>
-              </>: 
-              <>{cases.map((exampleCase, index) => (
-            <div key={exampleCase.id} className="bg-gray-700 p-4 rounded-lg shadow-md space-y-2">
-              <div>
-                <label className="pb-1 block text-sm font-medium text-gray-300">Input</label>
-                <input
-                  type="text"
-                  value={exampleCase.input}
-                  onChange={(e) => handleInputChange(index, 'input', e.target.value)}
-                  className="w-full p-2 rounded-md bg-gray-800 text-white border border-gray-600"
-                />
-              </div>
-              <div>
-                <label className="pb-1 block text-sm font-medium text-gray-300">Expected Output</label>
-                <input
-                  type="text"
-                  value={exampleCase.output}
-                  onChange={(e) => handleInputChange(index, 'output', e.target.value)}
-                  className="w-full p-2 rounded-md bg-gray-800 text-white border border-gray-600"
-                />
-              </div>
+                {exampleCasesExecution ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="bg-slate-950/60 border border-slate-900 rounded-2xl p-4 max-h-[30vh] overflow-y-auto custom-scrollbar shadow-inner">
+                      <ExampleCasesOutput exampleCasesExecution={exampleCasesExecution} />
+                    </div>
+                    <button 
+                      className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold font-outfit border border-slate-700/60 transition duration-300" 
+                      onClick={() => setExampleCasesExecution(null)}
+                    >
+                      Reset Testcases
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-1 custom-scrollbar">
+                    {cases.map((exampleCase, index) => (
+                      <div key={exampleCase.id} className="bg-slate-950/40 border border-slate-900/60 p-4 rounded-2xl shadow-sm space-y-3">
+                        <div className="flex items-center justify-between border-b border-slate-900/40 pb-1.5">
+                          <span className="text-[12px] font-bold font-outfit text-orange-400/80 uppercase tracking-widest">
+                            Case {index + 1}
+                          </span>
+                        </div>
+                        <div>
+                          <label className="pb-1 block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Input</label>
+                          <input
+                            type="text"
+                            value={exampleCase.input}
+                            onChange={(e) => handleInputChange(index, 'input', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-850 text-slate-300 focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-mono text-[13px] placeholder-slate-700 transition"
+                          />
+                        </div>
+                        <div>
+                          <label className="pb-1 block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Expected Output</label>
+                          <input
+                            type="text"
+                            value={exampleCase.output}
+                            onChange={(e) => handleInputChange(index, 'output', e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-850 text-slate-300 focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-mono text-[13px] placeholder-slate-700 transition"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+            
+            {/* Embedded modern shared timer */}
+            <div className="pt-2">
+              <Timer previlige={previlige} remoteSocketId={remoteSocketId} />
             </div>
-          ))}</>
-            }
-          </>
-          }
-          <div className="bg-gray-800 p-2 rounded-lg shadow-lg">
-            <Timer previlige={previlige} remoteSocketId={remoteSocketId}/>
           </div>
-          </div>
+
         </div>
       </div>
 
-      <div className="px-6 bg-gray-900 mx-8 rounded-lg p-8 w-1/2">
-        <div className="bg-gray-900 rounded-lg shadow-md relative h-full">
-        <div>
-          <div className="flex justify-between items-center bg-gray-900 border-b-2 border-gray-700 pb-4">
-            <div className="flex space-x-4 ">
-            <button onClick={clickRun} className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-              >
-              Run
-            </button>
-            <button onClick={dropdownqs} className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
-              See Question Here 
-            </button>
-
-            {showQuestion && (
-        <div className="fixed z-10 mt-16 w-full min-h-[600px] max-w-[1000px] max-h-[600px] overflow-y-auto bg-white text-black rounded-lg shadow-lg border border-gray-300 p-6">
-          <p className="text-md leading-relaxed">
-            <strong className="text-lg">Question:</strong> <br />
-            <hr className='border-2 border-slate-400'></hr>
-            {previlige ? (
-              <textarea
-                value={question}
-                onChange={(e)=>{changeQs(e)}}
-                className="w-full h-[600px] p-3 border border-gray-400 rounded-md text-black resize-none "
-              />
-            ) : (
-              <p className="whitespace-pre-wrap">{question}</p>
-            )}
-          </p>
-        </div>
-      )}
+      {/* Middle panel: Code Editor Workbench */}
+      <div className="flex-1 flex flex-col bg-slate-900/30 backdrop-blur-md border border-slate-900 p-6 rounded-[28px] shadow-xl z-10 overflow-hidden">
+        <div className="flex flex-col h-full relative">
+          
+          {/* Coding workbench headers */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between border-b border-slate-900 pb-4 mb-4">
             
-          </div>
-          <div className="flex space-x-4 items-center  rounded-t-lg">
-            <select onChange={(e) => handleLanguageChange(e.target.value)}value={language}
-                className="p-1 text-white bg-gray-800 border border-gray-600 rounded focus:outline-none focus:ring focus:ring-blue-500"
-            >
-              <option value="cpp">C++</option>
-                  <option value="c">C</option>
-                  <option value="java">Java</option>
-                  <option value="python">Python</option>
+            {/* Workbench Actions */}
+            <div className="flex space-x-3">
+              <button 
+                onClick={clickRun} 
+                className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold font-outfit rounded-xl shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 active:scale-[0.98] transition-all duration-300"
+              >
+                Run
+              </button>
+              <button 
+                onClick={dropdownqs} 
+                className="px-5 py-2.5 bg-slate-850 hover:bg-slate-800 text-slate-200 hover:text-white font-bold font-outfit rounded-xl border border-slate-750 transition-all duration-300"
+              >
+                See Question
+              </button>
+
+              {/* Responsive custom design see-question modal overlay */}
+              {showQuestion && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fadeIn">
+                  <div className="bg-slate-900 border border-slate-850 rounded-[32px] max-w-3xl w-full p-8 shadow-2xl relative max-h-[85vh] flex flex-col">
+                    
+                    <div className="flex justify-between items-center pb-4 border-b border-slate-850 mb-6">
+                      <h2 className="text-2xl font-bold font-outfit bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                        Coding Assignment
+                      </h2>
+                      <button 
+                        onClick={dropdownqs} 
+                        className="text-slate-400 hover:text-white transition text-xl font-bold"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                      {previlige ? (
+                        <textarea
+                          value={question}
+                          onChange={(e) => {changeQs(e)}}
+                          className="w-full h-[45vh] p-5 rounded-2xl bg-slate-950 border border-slate-850 text-slate-200 focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-mono text-[14px] leading-relaxed resize-none custom-scrollbar"
+                          placeholder="Write or edit the programming question here..."
+                        />
+                      ) : (
+                        <p className="whitespace-pre-wrap text-slate-300 font-sans text-[15px] leading-relaxed bg-slate-950/40 border border-slate-950 p-6 rounded-2xl">
+                          {question || "The interviewer has not added a question description yet."}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <button 
+                        onClick={dropdownqs} 
+                        className="px-6 py-2.5 bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white font-semibold font-outfit rounded-xl border border-slate-700/60 transition duration-300"
+                      >
+                        Back to Editor
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Workbench Config Selectors */}
+            <div className="flex space-x-3 items-center">
+              <select 
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                value={language}
+                className="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-850 text-slate-300 hover:text-white focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-outfit text-sm font-semibold cursor-pointer transition duration-300"
+              >
+                <option value="cpp">C++</option>
+                <option value="c">C</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
               </select>
 
               <select
-                  onChange={(e) => handleThemeChange(e.target.value)}
-                  value={theme}
-                  className="p-1 text-white bg-gray-800 border border-gray-600 rounded focus:outline-none focus:ring focus:ring-blue-500"
+                onChange={(e) => handleThemeChange(e.target.value)}
+                value={theme}
+                className="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-850 text-slate-300 hover:text-white focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-outfit text-sm font-semibold cursor-pointer transition duration-300"
               >
-                  <option value="vs-dark">Dark</option>
-                  <option value="light">Light</option>
-                  <option value="hc-black">High Contrast</option>
+                <option value="vs-dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="hc-black">High Contrast</option>
               </select>
+            </div>
+
           </div>
-        </div>
-        <div className="p-5 bg-gray-800 rounded-lg shadow-lg my-4">
-          <Editor height="63vh" width="100%"
+
+          {/* Monaco Editor Canvas Container */}
+          <div className="flex-1 p-4 bg-slate-950/60 border border-slate-900 rounded-2xl shadow-inner flex flex-col">
+            <Editor 
+              height="100%" 
+              width="100%"
               language={language}
               value={code}
               theme={theme}
               onChange={(e) => {changecode(e)}}
-              options={{fontSize: 16,
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        automaticLayout: true,
-                        wordWrap: "on",
-                        }}
-              className="rounded-lg overflow-hidden border border-gray-700"/>
+              options={{
+                fontSize: 16,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                wordWrap: "on",
+              }}
+              className="rounded-xl overflow-hidden border border-slate-900"
+            />
           </div>
-          </div>
-          </div>
+
+        </div>
       </div>
     
-      <div className='w-1/4 h-full bg-gray-900 p-6 rounded-lg'>
-  {connectionReady ? (
-    <>
-      <div className="bg-gray-800 h-full p-4 w-full rounded-lg shadow-md flex flex-col justify-evenly items-center space-y-6">
-    
-        <div className="w-full bg-gray-900 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold mb-3 text-white text-center">{remoteUser? remoteUser.fullname : 'Interviewer'}</h3>
-          <div className="bg-gray-900 h-48 w-full rounded-lg flex justify-center items-center text-white shadow-inner border border-gray-700">
-            {remoteStream ? (
-              <video
-                ref={videoRef => {
-                  if (videoRef && remoteStream) {
-                    videoRef.srcObject = remoteStream;
-                    videoRef.muted = false;
-                  }
-                }}
-                autoPlay
-                playsInline
-                className="rounded-lg h-full w-full"
-              />
-              ) : (
-                <p className="text-gray-400">Video Off</p>
-              )}
+      {/* Right panel: Video Feeds & Connection panel */}
+      <div className="w-full lg:w-1/4 flex flex-col bg-slate-900/30 backdrop-blur-md border border-slate-900 p-6 rounded-[28px] shadow-xl z-10 shrink-0 overflow-y-auto custom-scrollbar gap-4">
+        
+        {/* Room code banner */}
+        <div className="bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20 p-4 rounded-2xl flex items-center justify-between shadow-sm shrink-0">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">Session ID</span>
+            <p className="text-lg font-bold font-mono text-white tracking-wider mt-0.5">{roomId}</p>
           </div>
+          {copySuccess ? (
+            <span className="text-xs text-orange-400 font-bold font-outfit bg-orange-500/10 px-2.5 py-1 rounded-lg border border-orange-500/25">
+              Copied!
+            </span>
+          ) : (
+            <button 
+              onClick={handleCopy} 
+              className="bg-slate-950 hover:bg-slate-900 border border-slate-850 p-2 rounded-xl transition duration-300 flex items-center justify-center shrink-0 shadow-inner"
+              title="Copy Room ID"
+            >
+              <img className="w-5 h-5 filter invert-[70%]" src="/copy.png" alt="Copy" />
+            </button>
+          )}
         </div>
 
-        <div className="w-full bg-gray-900 p-4 rounded-lg">
-          <h3 className="text-xl font-semibold mb-3 text-white text-center">You</h3>
-          <ReactPlayer muted={!isAudioOn} height="0%" width="0%" url={mystream}/>
-          <div className="bg-gray-900 h-48 w-full rounded-lg flex justify-center items-center text-white shadow-inner border border-gray-700">
-            {isVideoOn ? (
-              <ReactPlayer 
-                playing={isVideoOn} 
-                muted={!isAudioOn}
-                height="100%" 
-                width="100%" 
-                url={mystream}
-                className="rounded-lg"
-              />
+        {/* Video Streams Container (Always Visible!) */}
+        <div className="bg-slate-950/40 border border-slate-900/60 p-4 rounded-2xl shadow-inner flex flex-col gap-4">
+          
+          {/* Peer Video Card */}
+          <div className="bg-slate-900/60 border border-slate-900/80 p-3.5 rounded-xl flex flex-col items-center">
+            <h3 className="text-xs font-bold font-outfit mb-2.5 text-slate-300 tracking-wide">
+              {connectionReady && remoteUser ? remoteUser.fullname : (previlige ? 'Candidate' : 'Interviewer')}
+            </h3>
+            <div className="bg-slate-950 h-36 w-full rounded-xl flex justify-center items-center text-slate-400 shadow-inner border border-slate-900 overflow-hidden relative">
+              {connectionReady && remoteStream ? (
+                <video
+                  ref={videoRef => {
+                    if (videoRef && remoteStream) {
+                      videoRef.srcObject = remoteStream;
+                      videoRef.muted = false;
+                    }
+                  }}
+                  autoPlay
+                  playsInline
+                  className="rounded-xl h-full w-full object-cover border border-emerald-500/20"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-center p-4">
+                  <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></span>
+                  <p className="text-[11px] font-outfit font-bold text-slate-500 uppercase tracking-widest">
+                    Awaiting Partner...
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Self Video Card */}
+          <div className="bg-slate-900/60 border border-slate-900/80 p-3.5 rounded-xl flex flex-col items-center">
+            <h3 className="text-xs font-bold font-outfit mb-2.5 text-slate-300 tracking-wide">You</h3>
+            <ReactPlayer muted={!isAudioOn} height="0%" width="0%" url={mystream} />
+            <div className="bg-slate-950 h-36 w-full rounded-xl flex justify-center items-center text-slate-400 shadow-inner border border-slate-900 overflow-hidden relative">
+              {isVideoOn ? (
+                <ReactPlayer 
+                  playing={isVideoOn} 
+                  muted={!isAudioOn}
+                  height="100%" 
+                  width="100%" 
+                  url={mystream}
+                  className="rounded-xl object-cover"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-xl">📷</span>
+                  <p className="text-xs font-outfit font-semibold text-slate-500">Camera Off</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Share stream action */}
+          {connectionReady && show_share_streams ? (
+            <button 
+              onClick={sendstreams} 
+              className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold font-outfit text-xs rounded-xl shadow-lg transition duration-300"
+            >
+              Share Stream
+            </button>
+          ) : null}
+
+        </div>
+
+        {/* Requests & Host Tools (Shown if host and not connected yet) */}
+        {previlige && !connectionReady && (
+          <div className="bg-slate-950/40 border border-slate-900/60 p-4 rounded-2xl shadow-inner flex flex-col flex-1 min-h-[150px]">
+            <p className="text-[11px] font-bold font-outfit text-slate-400 mb-3 tracking-widest uppercase border-b border-slate-900 pb-1.5">
+              Join Requests
+            </p>
+            {requsername.length ? (
+              <div className="space-y-2 overflow-y-auto max-h-[200px] pr-1 custom-scrollbar">
+                {requsername.map((x, index) => (
+                  <div key={index} className="flex items-center justify-between bg-slate-900/60 border border-slate-900 p-2.5 rounded-xl gap-2">
+                    <div className="flex items-center space-x-2 min-w-0">
+                      <img className="h-7 w-7 rounded-full border border-slate-800 shrink-0" src={x.user.avatar} alt="avatar" />
+                      <p className="text-xs text-slate-200 font-medium truncate font-outfit">{x.user.fullname}</p>
+                    </div>
+                    <button 
+                      onClick={() => {acceptrequest(index)}} 
+                      className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 rounded-lg font-bold text-[10px] transition duration-300 shrink-0"
+                    >
+                      Accept
+                    </button>
+                  </div>
+                ))}
+              </div>
             ) : (
-              <p className="text-gray-400">Video Off</p>
+              <div className="flex flex-col items-center justify-center m-auto text-center gap-1.5 py-4">
+                <span className="text-xl animate-pulse">📡</span>
+                <p className="text-[10px] font-outfit font-semibold text-slate-500 tracking-wider">Awaiting connections...</p>
+              </div>
             )}
           </div>
-        </div>
-
-        { show_share_streams ? <>
-          <button 
-          onClick={sendstreams} 
-          className="px-6 py-2 bg-blue-600 text-white font-medium text-sm rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-transform transform hover:scale-105 active:scale-95"
-          >
-            Share Stream
-          </button>
-          </>:<></>
-        }
-        
-
-      </div>
-    </>
-  ) : (
-    <>
-      <div className='bg-green-600 mb-6 p-2 rounded-xl flex justify-between items-center'>
-            <p className="text-3xl font-bold text-center">Room: {roomId}</p>
-            {copySuccess? <>
-              <p className="text-lg text-white text-center">Copied!</p>
-            </>:
-            <button onClick={handleCopy} className="bg-white text-white px-3 py-1 rounded-lg ml-4 hover:bg-blue-200 transition-all">
-              <img className='w-6' src='/copy.png'/>
-            </button>
-            }
-      </div>
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
-        <p className="text-lg font-semibold mb-4">Join Requests</p>
-        {requsername.length ? (
-          <>
-          {requsername.map((x,index)=>(
-            <div key={index} className="flex items-evenly items-center justify-between bg-gray-700 p-4 rounded-lg shadow-md">
-              <img className='h-10 w-10 rounded-full border-gray-50 border-2' src={x.user.avatar}/>
-              <p className="text-gray-300">{x.user.fullname}</p>
-              <button 
-                onClick={()=>{acceptrequest(index)}} 
-                className="px-2 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out"
-              >
-                Accept
-              </button>
-            </div>
-          ))}
-          </>
-        ) : (
-          <p className="text-gray-400">No requests yet.</p>
         )}
-      </div>
-    </>
-  )}
-  
-      </div>
-    
-    </div>
 
+      </div>
+
+    </div>
   );
 }
 

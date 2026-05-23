@@ -1,19 +1,30 @@
-import {Router} from 'express'
-import {upload} from '../middlewares/multer.middleware.js'
-import { verifyJWT } from '../middlewares/auth.middleware.js';
-import { getCurrentUser, gettemplateandlang, loginUser, logoutUser, refreshAccessToken, registerUser, setdefaultlang, settemplate, updateAvatar } from '../controllers/user.controller.js';
+import { Router } from "express";
+import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import {
+  getCurrentUser,
+  gettemplateandlang,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  registerUser,
+  setdefaultlang,
+  settemplate,
+  updateAvatar,
+} from "../controllers/user.controller.js";
 
-const router= Router();
-router.route('/register').post(registerUser);
-router.route('/login').post(loginUser);
+const router = Router();
 
-//SECURED ROUTES
-router.route('/logout').post(verifyJWT,logoutUser);
-router.route('/refresh-token').post(refreshAccessToken);
-router.route('/getcurrentuser').get(verifyJWT,getCurrentUser);
-router.route("/updateavatar").patch(verifyJWT, upload.single("avatar"), updateAvatar);  
-router.route('/updatedefaultlang/:lang').post(verifyJWT,setdefaultlang);
-router.route('/updatetemplate/:lang').post(verifyJWT,settemplate);
-router.route('/getdeflangandtemplate').get(verifyJWT,gettemplateandlang);
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.post("/refresh-token", refreshAccessToken);
+
+// Protected Routes
+router.post("/logout", verifyJWT, logoutUser);
+router.get("/getcurrentuser", verifyJWT, getCurrentUser);
+router.patch("/updateavatar", verifyJWT, upload.single("avatar"), updateAvatar);
+router.post("/updatedefaultlang/:lang", verifyJWT, setdefaultlang);
+router.post("/updatetemplate/:lang", verifyJWT, settemplate);
+router.get("/getdeflangandtemplate", verifyJWT, gettemplateandlang);
 
 export default router;
