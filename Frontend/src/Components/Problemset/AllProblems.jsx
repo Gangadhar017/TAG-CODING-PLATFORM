@@ -19,7 +19,11 @@ const AllProblems = () => {
         const helper = async () => {
             const response1 = await getAllProblemsService();
             const response2 = await getSolvedProblemService();
-            if (response1) setproblems(response1);
+            if (response1) {
+                setproblems(response1);
+            } else {
+                setproblems([]);
+            }
             if (response2) setSolvedProblems(response2);
         };
         helper();
