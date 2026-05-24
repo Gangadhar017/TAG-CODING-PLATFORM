@@ -1,12 +1,10 @@
 services:
   - type: web
     name: tag-coding-platform
-    env: node
+    env: docker
     region: oregon
     plan: free
     rootDir: Backend
-    buildCommand: npm install
-    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
