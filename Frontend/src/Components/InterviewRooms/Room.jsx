@@ -12,6 +12,7 @@ import { defaultCodes, enterFullScreen } from './helper.js';
 import { toast } from 'react-hot-toast';
 import peer from '../../Services/peer.js';
 import Loading from '../Loading/Loading.jsx';
+import { getAllProblemsService, getProblemService } from '../../Services/Problem.service.js';
 
 function Room() {
   const navigate=useNavigate();
@@ -36,6 +37,7 @@ function Room() {
   const location = useLocation();
   const extraInfo = location.state;
   const [previlige,setprevilige]=useState(false);
+  const [dbProblems, setDbProblems] = useState([]);
   useEffect(()=>{
       const nonparsedUser = localStorage.getItem('user');
       const user = JSON.parse(nonparsedUser); 
@@ -48,6 +50,18 @@ function Room() {
           setconnectionReady(true);
       }
   },[remoteSocketId]);
+
+  useEffect(() => {
+    if (previlige) {
+      const fetchProblems = async () => {
+        const response = await getAllProblemsService();
+        if (response) {
+          setDbProblems(response);
+        }
+      };
+      fetchProblems();
+    }
+  }, [previlige]);
 
   const socket=useSocket();
 
@@ -375,6 +389,63 @@ function Room() {
     setShowQuestion((prev) => !prev);
   };
 
+  const handleLoadSeededProblem = async (problemId) => {
+    if (!problemId) return;
+    toast.loading("Loading problem details...", { id: "load-prob" });
+    const fullProblem = await getProblemService(problemId);
+    if (fullProblem) {
+      const formattedQs = `TITLE: ${fullProblem.title}
+DIFFICULTY: ${fullProblem.difficulty.toUpperCase()}
+
+DESCRIPTION:
+${fullProblem.description}
+
+CONSTRAINTS:
+${fullProblem.constraints && fullProblem.constraints.length > 0 ? fullProblem.constraints.map(c => `- ${c}`).join('\n') : "None"}
+
+INPUT FORMAT:
+${fullProblem.input_format || "Standard input"}
+
+OUTPUT FORMAT:
+${fullProblem.output_format || "Standard output"}
+`;
+      
+      setquestion(formattedQs);
+      socket.emit('question:change', { remoteSocketId, question: formattedQs });
+
+      if (fullProblem.example_cases && fullProblem.example_cases.length > 0) {
+        const newCases = fullProblem.example_cases.map((ec, idx) => ({
+          id: idx + 1,
+          input: ec.input,
+          output: ec.output
+        }));
+        setCases(newCases);
+        socket.emit('cases:change', { remoteSocketId, cases: newCases });
+      }
+      toast.success("Problem loaded and synced successfully!", { id: "load-prob" });
+    } else {
+      toast.error("Failed to load problem details.", { id: "load-prob" });
+    }
+  };
+
+  const handleAddCase = () => {
+    if (!previlige) return;
+    const newCases = [...cases, { id: Date.now(), input: '', output: '' }];
+    setCases(newCases);
+    socket.emit('cases:change', { remoteSocketId, cases: newCases });
+  };
+
+  const handleRemoveCase = (indexToRemove) => {
+    if (!previlige) return;
+    if (cases.length <= 1) {
+      toast.error("At least one testcase is required");
+      return;
+    }
+    const newCases = cases.filter((_, idx) => idx !== indexToRemove);
+    setCases(newCases);
+    socket.emit('cases:change', { remoteSocketId, cases: newCases });
+  };
+
   if(!mystream)
   {
     return (
@@ -456,6 +527,15 @@ function Room() {
                           <span className="text-[12px] font-bold font-outfit text-orange-400/80 uppercase tracking-widest">
                             Case {index + 1}
                           </span>
+                          {previlige && (
+                            <button
+                              onClick={() => handleRemoveCase(index)}
+                              className="text-[11px] font-bold font-outfit text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/20 hover:border-rose-500/40 transition duration-300"
+                              title="Delete Test Case"
+                            >
+                              Remove
+                            </button>
+                          )}
                         </div>
                         <div>
                           <label className="pb-1 block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Input</label>
@@ -463,6 +543,7 @@ function Room() {
                             type="text"
                             value={exampleCase.input}
                             onChange={(e) => handleInputChange(index, 'input', e.target.value)}
+                            readOnly={!previlige}
                             className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-850 text-slate-300 focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-mono text-[13px] placeholder-slate-700 transition"
                           />
                         </div>
@@ -472,11 +553,20 @@ function Room() {
                             type="text"
                             value={exampleCase.output}
                             onChange={(e) => handleInputChange(index, 'output', e.target.value)}
+                            readOnly={!previlige}
                             className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-850 text-slate-300 focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-mono text-[13px] placeholder-slate-700 transition"
                           />
                         </div>
                       </div>
                     ))}
+                    {previlige && (
+                      <button
+                        onClick={handleAddCase}
+                        className="w-full py-2.5 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 hover:border-orange-500/40 rounded-xl font-bold font-outfit text-xs transition duration-300 shadow-sm"
+                      >
+                        + Add Test Case
+                      </button>
+                    )}
                   </div>
                 )}
               </>
@@ -530,14 +620,35 @@ function Room() {
                       </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
                       {previlige ? (
-                        <textarea
-                          value={question}
-                          onChange={(e) => {changeQs(e)}}
-                          className="w-full h-[45vh] p-5 rounded-2xl bg-slate-950 border border-slate-850 text-slate-200 focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-mono text-[14px] leading-relaxed resize-none custom-scrollbar"
-                          placeholder="Write or edit the programming question here..."
-                        />
+                        <>
+                          {dbProblems.length > 0 && (
+                            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex flex-col gap-2 font-outfit">
+                              <label className="text-[12px] font-bold text-orange-400/80 uppercase tracking-widest">
+                                Load Seeded Problem
+                              </label>
+                              <select
+                                onChange={(e) => handleLoadSeededProblem(e.target.value)}
+                                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 focus:outline-none focus:ring-1 focus:ring-orange-500/30 text-sm font-semibold cursor-pointer transition duration-300"
+                                defaultValue=""
+                              >
+                                <option value="" disabled>-- Select a pre-seeded coding problem --</option>
+                                {dbProblems.map((p) => (
+                                  <option key={p._id} value={p._id}>
+                                    {p.title} ({p.difficulty})
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                          <textarea
+                            value={question}
+                            onChange={(e) => {changeQs(e)}}
+                            className="w-full h-[35vh] p-5 rounded-2xl bg-slate-950 border border-slate-850 text-slate-200 focus:outline-none focus:ring-1 focus:ring-orange-500/30 font-mono text-[14px] leading-relaxed resize-none custom-scrollbar"
+                            placeholder="Write or edit the programming question here..."
+                          />
+                        </>
                       ) : (
                         <p className="whitespace-pre-wrap text-slate-300 font-sans text-[15px] leading-relaxed bg-slate-950/40 border border-slate-950 p-6 rounded-2xl">
                           {question || "The interviewer has not added a question description yet."}
