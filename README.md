@@ -56,8 +56,9 @@ graph TD
     
     %% Relationships
     A -->|HTTP Requests| D
-    B <-->|Bidirectional Real-Time| D
-    C <-->|Video/Audio P2P| C
+    B -->|WS Session Sync| D
+    D -->|WS Session Sync| B
+    C -->|WebRTC Direct P2P AV| C
     
     D -->|Queries & Seeding| G
     D -->|Executes Compilations| E
@@ -84,15 +85,21 @@ graph TD
 The application is fully containerized using **Docker** for production, ensuring that all compiler binaries (`javac`, `g++`, `python3`, `gcc`) are fully pre-installed and available inside the hosting container automatically.
 
 ### 1. Production Docker Environment Variables
-Configure these variables in your **Render Web Service (Docker)** dashboard:
+
+> [!CAUTION]
+> **CRITICAL SECURITY WARNING**: NEVER expose your real production credentials (`MONGODB_URI`) or active session secrets in your public git repository. 
+> * **Immediate Action Required**: If you have already committed live credentials, **rotate/change your MongoDB password immediately** in the MongoDB Atlas dashboard.
+> * Always keep credentials safe by using Render Environment Variables or a local gitignored `.env` file.
+
+Configure these variables securely in your **Render Web Service (Docker)** dashboard:
 
 ```env
-MONGODB_URI=mongodb+srv://gangadharglau_db_user:DmHlFqwFuW13WAEp@tagdb.wh3trce.mongodb.net/?appName=TAGDB
+MONGODB_URI=mongodb+srv://<username>:<password>@tagdb.wh3trce.mongodb.net/?appName=TAGDB
 DB_NAME=tagDB
 PORT=8000
 CORS_ORIGIN=*
-ACCESS_TOKEN_SECRET=mysupersecretkey_123456789
-REFRESH_TOKEN_SECRET=myrefreshsecretkey_987654321
+ACCESS_TOKEN_SECRET=your_super_secret_access_key
+REFRESH_TOKEN_SECRET=your_super_secret_refresh_key
 ACCESS_TOKEN_EXPIRY=1d
 REFRESH_TOKEN_EXPIRY=10d
 ```
