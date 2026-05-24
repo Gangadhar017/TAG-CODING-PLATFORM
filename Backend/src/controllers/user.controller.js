@@ -488,6 +488,18 @@ export const updateAvatar = asyncHandler(async (req, res) => {
       .json(new ApiResponse(400, null, "Avatar file missing"));
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
+  if (!avatar) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          null,
+          "Avatar upload failed. Cloudinary credentials not configured or upload error occurred."
+        )
+      );
+  }
+
   const user = await User.findByIdAndUpdate(
     req.user._id,
     { $set: { avatar: avatar.url } },
