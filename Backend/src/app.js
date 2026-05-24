@@ -29,6 +29,12 @@ app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// ─── Simple Request Logger ──────────────────────────────────────────────────
+app.use((req, res, next) => {
+  console.log(`[API REQUEST] ${req.method} ${req.url}`);
+  next();
+});
+
 // ─── API Routes ─────────────────────────────────────────────────────────────
 import userRouter from './routes/user.routes.js'
 import tweetRouter from './routes/tweet.routes.js'

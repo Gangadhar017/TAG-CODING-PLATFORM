@@ -14,17 +14,28 @@ const AllProblems = () => {
     const [solvedProblems, setSolvedProblems] = useState(new Set());
     const navigate = useNavigate();
     const [problems, setproblems] = useState(null);
+    const [debugInfo, setDebugInfo] = useState("Initializing...");
 
     useEffect(() => {
         const helper = async () => {
-            const response1 = await getAllProblemsService();
-            const response2 = await getSolvedProblemService();
-            if (response1) {
-                setproblems(response1);
-            } else {
+            try {
+                setDebugInfo("Fetching problems from service...");
+                const response1 = await getAllProblemsService();
+                
+                if (response1) {
+                    setDebugInfo(`Problems successfully loaded: ${response1.length} items.`);
+                    setproblems(response1);
+                } else {
+                    setDebugInfo("Problems service returned falsy. (Database empty or Server unreachable)");
+                    setproblems([]);
+                }
+                
+                const response2 = await getSolvedProblemService();
+                if (response2) setSolvedProblems(response2);
+            } catch (err) {
+                setDebugInfo(`Exception caught in helper: ${err.message || String(err)}`);
                 setproblems([]);
             }
-            if (response2) setSolvedProblems(response2);
         };
         helper();
     }, []);
@@ -90,6 +101,29 @@ const AllProblems = () => {
                         <span className="text-[13px] bg-slate-900 text-slate-400 font-semibold font-outfit px-3 py-1.5 rounded-full border border-slate-800">
                             Practice Arena
                         </span>
+                    </div>
+
+                    <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800/80 text-xs font-mono text-slate-400 flex items-center justify-between shadow-inner">
+                      <span className="truncate"><strong>System Status:</strong> {debugInfo}</span>
+                      <button 
+                        onClick={async () => {
+                          setDebugInfo("Re-fetching problems manually...");
+                          try {
+                            const res = await getAllProblemsService();
+                            if (res) {
+                              setDebugInfo(`Manual re-fetch successful: ${res.length} items.`);
+                              setproblems(res);
+                            } else {
+                              setDebugInfo("Manual re-fetch returned falsy. (Check network/database)");
+                            }
+                          } catch (e) {
+                            setDebugInfo(`Manual re-fetch error: ${e.message || String(e)}`);
+                          }
+                        }}
+                        className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-750 border border-slate-700 text-[10px] font-bold text-orange-400 hover:text-orange-300 transition shrink-0 ml-4 uppercase tracking-wider"
+                      >
+                        Retry
+                      </button>
                     </div>
 
                     <div className="bg-slate-900/20 backdrop-blur-md border border-slate-900 rounded-3xl overflow-hidden shadow-xl">
